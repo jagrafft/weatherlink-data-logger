@@ -1,11 +1,10 @@
 const now = new Date()
 const dt = now.toISOString()
 
-const base_path = ""
-
 const params = new Object({
+      app_path: "",
       log_path: "",
-      script_path: `${base_path}/js`,
+      pm2_script_dir: `pm2`,
       observable_connector_path: "",
       postgres_addr: "127.0.0.1",
       postgres_port: 3211,
@@ -19,9 +18,11 @@ module.exports = {
     apps: [
       {
          name: "observable-notebook-connector",
-         script: "observable-connector.js",
-         cwd: params.observable_connector_path,
+         script: `${pm2_script_dir}/observable-notebook-connector.js`,
+         cwd: params.app_path,
          env: {
+            "OBSERVABLE_CONNECTOR_PATH": params.observable_connector_path,
+            "OBSERVABLE_CONNECTOR_PROFILE": ""
          },
          autorestart: true,
          exec_mode: "fork",
@@ -32,10 +33,11 @@ module.exports = {
       },
       {
          name: "weatherlink-data-capture",
-         script: "app.js",
-         cwd: params.script_path,
+         script: `${pm2_script_dir}/weatherlink-data-capture.js`,
+         cwd: params.app_path,
          env: {
-            "POSTGRES_ADDR":  params.postgres_addr,
+            "APP_PATH": params.app_path,
+            "POSTGRES_ADDR": params.postgres_addr,
             "POSTGRES_PORT": params.postgres_port,
             "POSTGRES_USER": params.postgres_user,
             "POSTGRES_PASS": params.postgres_pass,
