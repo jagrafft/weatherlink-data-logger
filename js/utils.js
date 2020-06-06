@@ -53,7 +53,7 @@ export const mkInsertString = () => {
  * @param {String} cmd Command string
  * @returns {Fluture.<Future>}
  */
-export const pgWrite = (db, table, cmd) => {
+export const pgWrite = (pool, table, cmd) => {
     
 }
 
@@ -64,6 +64,6 @@ export const pgWrite = (db, table, cmd) => {
  * @param {String} table Table to check for
  * @returns {Fluture.<Future>}
  */
-export const tableExists = (db, table) => {
+export const tableExists = (pool, table) => {
     
 }
