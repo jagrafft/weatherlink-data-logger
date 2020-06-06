@@ -1,6 +1,6 @@
 # WeatherLink Data Logger
 [Node.js][nodejs] application, [PostgreSQL][pgsql] table architecture, and 
-[PM2][pm2] harness for logging data from a WeatherLink device via [weaterlink-live-local-api][wllla].
+[PM2][pm2] harness for logging data from a WeatherLink device via [weatherlink-live-local-api][wllla].
 
 [nodejs]: https://nodejs.org/
 [pgsql]: https://www.postgresql.org/
