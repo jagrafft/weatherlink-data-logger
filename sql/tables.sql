@@ -94,7 +94,8 @@ CREATE TABLE CONDITIONS_217639 (
 );
 
 CREATE TABLE LOAD_ERRORS (
-    id INTEGER PRIMARY KEY,
-    err VARCHAR,
-    data VARCHAR
+        id INTEGER PRIMARY KEY,
+        err VARCHAR,
+        packet VARCHAR,
+        ts TIMESTAMP
 );

@@ -2,7 +2,7 @@ const {exec} = require("child_process")
 
 process.chdir(process.env.APP_PATH)
 
-const cmd = ""
+const cmd = "node js/app.js"
 
 exec(cmd, (error, stdout, stderr) => {
 	if (error) {

@@ -1,6 +1,6 @@
 // Well-built library for the `Future` type, used to make
 // operations asynchronous
-const {Future} = require("fluture")
+const { Future } = require("fluture")
 const request = require("request")  // API for HTTP requests
 
 // TODO Wrap in Future
@@ -35,15 +35,19 @@ data_request = (url) => {
  * @returns {Fluture.<Future>} `id` || Failure
  */
 export const entityExistsOrInsert = (pool, table, entity) => {
-    
+  return Future((reject, resolve) => {
+    pool.query(
+  })
 }
 
 /**
- * @param {} 
+ * @param {Object} obj 
  * @returns {Fluture.<Future>}
  */
-export const mkInsertString = () => {
+export const mkInsertString = (obj) => {
+  return Future((reject, resolve) => {
     
+  })
 }
 
 /**
@@ -54,7 +58,12 @@ export const mkInsertString = () => {
  * @returns {Fluture.<Future>}
  */
 export const pgWrite = (pool, table, cmd) => {
-    
+  return Future((reject, resolve) => {
+   pool.query(`INSERT INTO ${table} ...`, [], (err, res) => {
+     if (err) { reject() }
+     resolve(res)
+   })
+  })
 }
 
 // TODO Refactor to build table?
@@ -65,5 +74,10 @@ export const pgWrite = (pool, table, cmd) => {
  * @returns {Fluture.<Future>}
  */
 export const tableExists = (pool, table) => {
-    
+  return Future((reject, resolve) => {
+    pool.query("", [table], (err, res) => {
+      if (err) { reject() }
+      resolve(res)
+    })
+  })
 }

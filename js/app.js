@@ -1,5 +1,5 @@
 // Ideas //
-// - Refactor to use xstream.js for writing to a Kafka service
+// version2 => Refactor to use xstream.js for writing to a Kafka service
 
 const Pool = require("pg")  // postgres connection pool
 
