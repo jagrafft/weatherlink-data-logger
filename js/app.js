@@ -26,5 +26,5 @@ const weatherlink_url = process.env.WEATHERLINK_URL
 `setInterval` executes a function every $n$ milliseconds
 */
 setInterval(() => {
-    data_request(weatherlink_url)
+    data_request(weatherlink_url).then(X => console.log(X))
 }, process.env.DATA_REFRESH_INTERVAL_MS)
