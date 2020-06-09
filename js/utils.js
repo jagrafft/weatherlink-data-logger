@@ -10,20 +10,22 @@ const request = require("request")  // API for HTTP requests
  * @returns {Fluture.<Future>}
  */
 data_request = (url) => {
-  request.get({
-    url: weatherlink_url,
-    json: true,
-    headers: {"User-Agent": "request"}
-  }, (err, res, data) => {
-    if (err) {
-        console.error(err)
-    } else if (res.statusCode !== 200) {
-        console.log(`Status: ${res.statusCode}`)
-    } else {
-        // Chain of futures...
-        console.log(data)
-    }
-  })
+    return Future((reject, resolve) => {
+        request.get({
+            url: weatherlink_url,
+            json: true,
+            headers: {"User-Agent": "request"}
+        }, (err, res, data) => {
+            if (err) {
+                reject(`ERROR: ${err}`)
+            } else if (res.statusCode !== 200) {
+                reject(`STATUS: ${res.statusCode}`)
+            } else {
+                // Chain of futures...
+                resolve(data)
+            }
+        })
+    })
 }
 
 /**

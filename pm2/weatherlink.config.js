@@ -26,6 +26,7 @@ module.exports = {
          cwd: process.env.APP_PATH,
          env: {
             "APP_PATH": process.env.APP_PATH,
+            "DATA_REFRESH_INTERVAL_MS": process.env.DATA_REFRESH_INTERVAL,
             "POSTGRES_ADDR": process.env.POSTGRES_ADDR,
             "POSTGRES_PORT": process.env.POSTGRES_PORT,
             "POSTGRES_USER": process.env.POSTGRES_USER,

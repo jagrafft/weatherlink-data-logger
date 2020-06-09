@@ -27,4 +27,4 @@ const weatherlink_url = process.env.WEATHERLINK_URL
 */
 setInterval(() => {
     data_request(weatherlink_url)
-}, 1000) // Refresh interval, in milliseconds
+}, process.env.DATA_REFRESH_INTERVAL_MS)
