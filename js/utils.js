@@ -5,10 +5,10 @@ const request = require("request")  // API for HTTP requests
  * @param {String} url URL to request from
  * @returns {Promise}
  */
-data_request = (url) => {
+module.exports.data_request = (url) => {
     return new Promise((resolve, reject) => {
         request.get({
-            url: weatherlink_url,
+            url: url,
             json: true,
             headers: {"User-Agent": "request"}
         }, (err, res, data) => {
@@ -23,52 +23,48 @@ data_request = (url) => {
     })
 }
 
-// TODO Insert if not exists
 /**
- * Check if `entity` exists in postgres `table` in `pool` then return its
- * primary key or insert entity on fail
+ * Find `entity` in postgres `table` then return it's primary key
  * @param {} pool PostgreSQL pool
- * @param {String} table Table to search
- * @param {String} column Column to search
- * @param {String|Number} entity Value to search `table.column` for
+ * @param {String} table Table
+ * @param {String} relation Column
+ * @param {String|Number} entity
  * @returns {Promise} `id` || Failure
  */
-export const entityExistsOrInsert = (pool, table, column, entity) => {
+module.exports.lookupEntity = (pool, table, relation, entity) => {
     return new Promise((resolve, reject) => {
+	const entity_fmt = typeof entity === "number" ? entity : `'${entity}'`
         pool.query(
-            "SELECT EXISTS(SELECT 1 FROM $1::text t WHERE t.$2::text = $3)",
-            [table, column, entity],
+	    `SELECT id FROM ${table} WHERE ${relation} = ${entity_fmt}`,
+	    (err, res) => {
+	        if (err) { reject(`ERROR: ${err}`) }
+		resolve(res)
+	    }
+	)
+    })
+}
+
+
+/**
+ * Insert `entity` into postgres `table` in `pool` then return its
+ * primary key
+ * @param {} pool PostgreSQL pool
+ * @param {String} table Table 
+ * @param {String} relation Column
+ * @param {String|Number} entity Value to search `table.relation` for
+ * @returns {Promise} `id` || Failure
+ */
+module.exports.insertEntity = (pool, table, relation, entity) => {
+    return new Promise((resolve, reject) => {
+	const entity_fmt = typeof entity === "number" ? entity : `'${entity}'`
+        pool.query(`
+	     SELECT 1 FROM ${table} WHERE ${relation} = ${entity_fmt}
+	     IF NOT EXISTS (
+	     BEGIN
+		INSERT INTO ${table}(${relation}) VALUES (${entity_fmt}) RETURNING id
+	     END)`,
             (err, res) => {
                 if (err) { reject(`ERROR: ${err}`) }
-                resolve(res)
-            }
-        )
-    })
-}
-
-/**
- * @param {Object} obj 
- * @returns {Promise}
- */
-export const mkInsertString = (obj) => {
-    return new Promise((resolve, reject) => {
-    })
-}
-
-/**
- * Write `cmd` to postgres `table` in `pool`
- * @param {} pool PostgreSQL pool
- * @param {String} table Table to write to
- * @param {String} cmd Command string
- * @returns {Promise}
- */
-export const pgWrite = (pool, table, cmd) => {
-    return new Promise((resolve, reject) => {
-        pool.query(
-            "INSERT INTO $1::text $2::text",
-            [table, cmd],
-            (err, res) => {
-                if (err) { reject() }
                 resolve(res)
             }
         )
@@ -82,7 +78,7 @@ export const pgWrite = (pool, table, cmd) => {
  * @param {String} table Table to check for
  * @returns {Promise}
  */
-export const tableExists = (pool, table) => {
+module.exports.tableExists = (pool, table) => {
     return new Promise((resolve, reject) => {
         pool.query(
             "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_schema='public' AND table_name='$1::text');",
