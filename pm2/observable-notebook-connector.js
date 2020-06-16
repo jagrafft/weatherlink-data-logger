@@ -1,8 +1,9 @@
+require("dotenv").config()
 const {exec} = require("child_process")
 
-process.chdir(process.env.OBSERVABLE_NOTEBOOK_PATH)
+process.chdir(process.env.OBSERVABLE_DATABASE_PROXY_PATH)
 
-const cmd = ""
+const cmd = `./bin/observable-database-proxy start ${process.env.OBSERVABLE_DATABASE_PROXY_PROFILE}` 
 
 exec(cmd, (error, stdout, stderr) => {
 	if (error) {

@@ -57,12 +57,7 @@ module.exports.lookupEntity = (pool, table, relation, entity) => {
 module.exports.insertEntity = (pool, table, relation, entity) => {
     return new Promise((resolve, reject) => {
 	const entity_fmt = typeof entity === "number" ? entity : `'${entity}'`
-        pool.query(`
-	     SELECT 1 FROM ${table} WHERE ${relation} = ${entity_fmt}
-	     IF NOT EXISTS (
-	     BEGIN
-		INSERT INTO ${table}(${relation}) VALUES (${entity_fmt}) RETURNING id
-	     END)`,
+        pool.query(`INSERT INTO ${table}(${relation}) VALUES (${entity_fmt}) ON CONFLICT DO NOTHING`,
             (err, res) => {
                 if (err) { reject(`ERROR: ${err}`) }
                 resolve(res)

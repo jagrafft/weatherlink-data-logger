@@ -27,12 +27,30 @@ const weatherlink_url = process.env.WEATHERLINK_URL
 */
 setInterval(() => {
     data_request(weatherlink_url)
-        .then(res => res["data"])
+        .then(res => {
+	    res["data"]["lsids"] = res["data"]["conditions"].map(x => x["lsid"])
+	    return res["data"]
+	})
 	.then(data => {
 	    return Promise.allSettled([
 	        insertEntity(pool, "timestamps", "ts", data["ts"]),
-	        insertEntity(pool, "devices", "did", data["did"])
-	    ])
+	        insertEntity(pool, "devices", "did", data["did"]),
+		...data["conditions"].map(x => insertEntity(pool, "lsids", "lsid", x["lsid"]))
+	    ]).then(X => {
+		data["conditions"].forEach(obj => {
+		    // Identify `null` keys
+		    const null_keys = Object.entries(obj).reduce((a,c) => {
+			      if (c[1] === null) { a.push(c[0]) }
+			      return a
+			  }, [])
+		    // Drop nulls from Object
+		    if (null_keys.length > 0) {
+			    null_keys.forEach(x => delete obj[x])
+		    }
+		    // restructe Object into [...keys], [...values] (1:1 map, as in Object)
+		    console.log(null_keys)
+		    console.log(obj)
+		})
+	    })
 	})
-	.then(X => console.log(X))
 }, process.env.DATA_REFRESH_INTERVAL_MS)
