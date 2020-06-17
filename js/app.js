@@ -48,8 +48,9 @@ setInterval(() => {
 			    null_keys.forEach(x => delete obj[x])
 		    }
 		    // restructe Object into [...keys], [...values] (1:1 map, as in Object)
-		    console.log(null_keys)
-		    console.log(obj)
+		    // console.log(null_keys)
+		    // console.log(obj)
+		    console.log(X)
 		})
 	    })
 	})
