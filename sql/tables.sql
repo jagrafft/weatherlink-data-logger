@@ -79,13 +79,13 @@ CREATE TABLE CONDITIONS_317640 (
         FOREIGN KEY (lsid) REFERENCES LSIDS(id)
 );
 
-CREATE TABLE CONDITIONS_217639 (
+CREATE TABLE CONDITIONS_317639 (
         id SERIAL PRIMARY KEY,
         did INTEGER,
         ts INTEGER,
         lsid INTEGER,
         data_structure_type INTEGER,
-        bar_sea_leve DECIMAL,
+        bar_sea_level DECIMAL,
         bar_trend DECIMAL,
         bar_absolute DECIMAL,
         FOREIGN KEY (did) REFERENCES DEVICES(id),

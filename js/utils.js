@@ -24,28 +24,6 @@ module.exports.data_request = (url) => {
 }
 
 /**
- * Find `entity` in postgres `table` then return it's primary key
- * @param {} pool PostgreSQL pool
- * @param {String} table Table
- * @param {String} relation Column
- * @param {String|Number} entity
- * @returns {Promise} `id` || Failure
- */
-module.exports.lookupEntity = (pool, table, relation, entity) => {
-    return new Promise((resolve, reject) => {
-	const entity_fmt = typeof entity === "number" ? entity : `'${entity}'`
-        pool.query(
-	    `SELECT id FROM ${table} WHERE ${relation} = ${entity_fmt}`,
-	    (err, res) => {
-	        if (err) { reject(`ERROR: ${err}`) }
-		resolve(res)
-	    }
-	)
-    })
-}
-
-
-/**
  * Insert `entity` into postgres `table` in `pool` then return its
  * primary key
  * @param {} pool PostgreSQL pool
@@ -54,30 +32,51 @@ module.exports.lookupEntity = (pool, table, relation, entity) => {
  * @param {String|Number} entity Value to search `table.relation` for
  * @returns {Promise} `id` || Failure
  */
-module.exports.insertEntity = (pool, table, relation, entity) => {
+module.exports.dbTransact = (pool, query) => {
     return new Promise((resolve, reject) => {
-	const entity_fmt = typeof entity === "number" ? entity : `'${entity}'`
-	//const entity_fmt = `'${entity}'`
-	    //ON CONFLICT DO NOTHING?
-	const qry = `
-		DO $$
-		DECLARE 
-			eid INTEGER := ${table}.id FROM ${table} WHERE ${relation}=${entity_fmt};
-		BEGIN
-		IF eid IS NULL THEN
-			INSERT INTO ${table} (${relation}) VALUES (${entity_fmt});
-		END IF;
-		END
-		$$
-		`
-	console.log(qry)
-        pool.query(qry,
+	console.log(query)
+        pool.query(query,
             (err, res) => {
                 if (err) { reject(`ERROR: ${err}`) }
                 resolve(res)
             }
         )
     })
+}
+
+/**
+ * Wrap non-number entites in single quotes
+ * @param {String} entity Entity to wrap
+ * @reutrns {String}
+ */
+const fmtEntity = (entity) => typeof entity === "number" ? entity : `'${entity}'`
+
+/**
+ * Create INSERT statament from inputs
+ * @param {} pool PostgreSQL pool
+ * @param {String} table Table
+ * @param {String} relation Column
+ * @param {String|Number} entity
+ * @returns {String}
+ */
+module.exports.insertSingleEntity = (table, relation, entity) => {
+    return `INSERT INTO ${table}(${relation}) VALUES (${fmtEntity(entity)}) ON CONFLICT DO NOTHING;`
+}
+
+module.exports.insertMultipleEntities = (table, relations, entities) => {
+    return `INSERT INTO ${table}(${relations.join(",")}) VALUES (${entities.map(fmtEntity).join(",")});`
+}
+
+/**
+ * Create SELECT statament from inputs
+ * @param {} pool PostgreSQL pool
+ * @param {String} table Table
+ * @param {String} relation Column
+ * @param {String|Number} entity
+ * @returns {String}
+ */
+module.exports.lookupEntity = (table, relation, entity) => {
+   return `SELECT id FROM ${table} WHERE ${relation} = ${fmtEntity(entity)};`
 }
 
 // TODO Refactor to build table?
@@ -87,6 +86,7 @@ module.exports.insertEntity = (pool, table, relation, entity) => {
  * @param {String} table Table to check for
  * @returns {Promise}
  */
+/*
 module.exports.tableExists = (pool, table) => {
     return new Promise((resolve, reject) => {
         pool.query(
@@ -99,3 +99,4 @@ module.exports.tableExists = (pool, table) => {
         )
     })
 }
+*/
