@@ -1,6 +1,7 @@
 use serde_json::{Result, Value};
 
 fn main() -> Result<()> {
+    /// See https://weatherlink.github.io/weatherlink-live-local-api/ for explanation of data elements
     let w00t = r#"
 {
   "data": {
@@ -73,8 +74,12 @@ fn main() -> Result<()> {
 "#;
 
     let v:Value = serde_json::from_str(w00t)?;
+    let data:&Value = &v["data"];
 
-    for c in v["data"]["conditions"].as_array().unwrap() {
+    println!("device id: {}", data["did"]);
+    println!("ts: {}", data["ts"]);
+
+    for c in data["conditions"].as_array().unwrap() {
         println!("lsid: {}", c["lsid"]);
     };
 
