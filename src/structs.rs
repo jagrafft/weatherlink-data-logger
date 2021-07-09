@@ -1,4 +1,4 @@
-/// Struct for integer tuples
+/// Struct for integer tuples (currently only Timestamp)
 struct IntPair {
     id: i32,
     val: i32
