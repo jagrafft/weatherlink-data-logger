@@ -1,7 +1,7 @@
 use serde_json::{Result, Value};
 
 fn main() -> Result<()> {
-    /// See https://weatherlink.github.io/weatherlink-live-local-api/ for explanation of data elements
+    // See https://weatherlink.github.io/weatherlink-live-local-api/ for explanation of data elements
     let w00t = r#"
 {
   "data": {
@@ -79,8 +79,14 @@ fn main() -> Result<()> {
     println!("device id: {}", data["did"]);
     println!("ts: {}", data["ts"]);
 
+    fn type_of<T>(_: &T) -> &'static str {
+        std::any::type_name::<T>()
+    }
+
     for c in data["conditions"].as_array().unwrap() {
-        println!("lsid: {}", c["lsid"]);
+        let obj = c.as_object().unwrap();
+        // switch statement on length for key extraction?
+        println!("lsid: {}, c: {:?}, type: {:?}", c["lsid"], obj.len(), type_of(obj));
     };
 
     Ok(())
