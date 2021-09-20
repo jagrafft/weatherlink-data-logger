@@ -1,6 +1,16 @@
-use serde_json::{Result, Value};
+use dotenv::dotenv;
+use hyper::Client;
+use hyper::body::Buf;
+use serde_json::{from_reader, Value};
+use std::env;
 
-fn main() -> Result<()> {
+type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    dotenv().ok();
+
+/*
     // See https://weatherlink.github.io/weatherlink-live-local-api/ for explanation of data elements
     let w00t = r#"
 {
@@ -73,21 +83,28 @@ fn main() -> Result<()> {
 }
 "#;
 
+    // Use json string above
     let v:Value = serde_json::from_str(w00t)?;
     let data:&Value = &v["data"];
+    //
+*/
 
+    // Request packet from WeatherLink station
+    let client = Client::new();
+    let url = format!("{}{}", env::var("WEATHERLINK_URL").unwrap(), env::var("WEATHERLINK_PATH").unwrap()).parse().unwrap();
+    let res = client.get(url).await?;
+    let body = hyper::body::aggregate(res).await?;
+    let json:Value = from_reader(body.reader())?;
+    let data:&Value = &json["data"];
+    //
+    
     println!("device id: {}", data["did"]);
     println!("ts: {}", data["ts"]);
-
-    fn type_of<T>(_: &T) -> &'static str {
-        std::any::type_name::<T>()
-    }
 
     for c in data["conditions"].as_array().unwrap() {
         let obj = c.as_object().unwrap();
         // switch statement on length for key extraction?
-        println!("lsid: {}, c: {:?}, type: {:?}", c["lsid"], obj.len(), type_of(obj));
+       println!("lsid: {}, packet_length: {:?}, data_structure_type: {:?}", c["lsid"], obj.len(), obj.get("data_structure_type"));
     };
-
     Ok(())
 }

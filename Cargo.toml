@@ -5,6 +5,8 @@ authors = ["jason a. grafft <j@grafft.co>"]
 edition = "2018"
 
 [dependencies]
-#diesel = { version = "*", features = ["postgres"] }
-#dotenv = "*"
+dotenv = "*"
+#postgres = "*"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
 serde_json = "*"

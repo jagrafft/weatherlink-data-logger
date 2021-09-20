@@ -3,21 +3,19 @@
 Next generation of the kludge-tastic Weatherlink Data Logger: JavaScript Edition. This time in Rust with a "fancy" sampler.
 
 ## Parameters Used
-| Parameter         |
-|:-----------------:|
-| `bar_sea_level`   |
-| `dew_point        |
-| `hum`idity        |
-| `hum_in`terior    |
-| `solar_rad`iation |
-| `temp`erature     |
-| `temp_in`terior   |
-| `timestamps`      |
-| `uv_index`        |
-| `wind_dir_last`   |
-| `wind_speed_last` |
-
-_not included, may not be:_ `heat_index, wind_chill, thw_index, thsw_index, dew_point_in, heat_index_in, rain_rate_*, rain_storm_start`
+| Parameter         | Data Type | SQL Data Type | Tolerance (θ) | Note       |
+|:------------------|-----------|:-------------:|---------------|------------|
+| `bar_sea_level`   | Inch      | `REAL`        |               |            |
+| `dew_point        | °F        | `REAL`        |               |            |
+| `hum`idity        | \%RH      | `REAL`        |               |            |
+| `hum_in`terior    | \%RH      | `REAL`        |               |            |
+| `solar_rad`iation | W/m²      | `REAL`        |               |            |
+| `temp`erature     | °F        | `REAL`        |               |            |
+| `temp_in`terior   | °F        | `REAL`        |               |            |
+| `timestamps`      | Integer   | `INT`         |               | Global key |
+| `uv_index`        | Index     | `REAL`        |               |            |
+| `wind_dir_last`   | °degree   | `REAL`        |               |            |
+| `wind_speed_last` | mph       | `REAL`        |               |            |
 
 See [wllla][WeatherLink Live local API] 
 
