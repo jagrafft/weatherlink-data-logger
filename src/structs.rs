@@ -1,19 +1,13 @@
-// Struct for float tuples
-struct FloatPair {
-    id: i32,
-    val: f64 
-}
-
-// Struct for integer tuples (currently only Timestamp)
-struct IntPair {
-    id: i32,
-    val: i32
-}
-
-// Struct to hold θ values for parameters
-struct ThetaValues {
-}
-
-// Struct to hold values of desired parameters
-struct ParameterValues {
+struct ParamVals{
+    timestamp: i64,
+    bar_sea_level: f64,
+    dew_point: f64,
+    hum: f64,
+    hum_in: f64,
+    solar_rad: f64,
+    temp: f64,
+    temp_in: f64,
+    uv_index: f64,
+    wind_dir_last: f64,
+    wind_speed_last: f64
 }
