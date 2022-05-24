@@ -1,0 +1,12 @@
+[dbs]
+
+[dbs.rai]
+db = "<DATABASE>"
+compute = "<COMPUTE>"
+profile = "default"
+
+[weatherlink]
+interval = 10
+url = "<URL>"
+path = "/v1/current_conditions"
+keys_to_retain = [ "bar_sea_level","dew_point","hum","hum_in","solar_rad","temp","temp_in","timestamp","uv_index","wind_dir_last","wind_speed_last" ]

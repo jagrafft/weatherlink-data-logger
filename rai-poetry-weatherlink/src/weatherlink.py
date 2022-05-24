@@ -1,40 +1,26 @@
-from datetime import datetime
-
-from dotenv import load_dotenv
-from json import load
-from os import getenv
-from railib import api, config
+from json import load as jsonload
+from pathlib import Path
+from pytomlpp import load as tomload
 from signal import SIGINT, signal
 from sys import exit
 from time import sleep
-from urllib.request import Request, urlopen
 
-load_dotenv()
+from datetime import datetime
 
-# Set global variables for session using `.env` file
-# COMPUTE = getenv("RAI_COMPUTE")
-# DATABASE = getenv("RAI_DB")
-REQUEST_INTERVAL = int(getenv("REQUEST_INTERVAL"))
-WEATHERLINK_URL_PATH = f"{getenv('WEATHERLINK_URL')}{getenv('WEATHERLINK_PATH')}"
+# from railib import api, config
+# from urllib.request import Request, urlopen
+
+# Load TOML configuration for app from 'config' directory
+wlconfig = tomload(Path(__file__).parent.parent / "config" / "wlconfig.toml")
+print(wlconfig)
+
+# Weatherlink service URL path
+WEATHERLINK_URL_PATH = (
+    f"{wlconfig['weatherlink']['url']}{wlconfig['weatherlink']['path']}"
+)
 
 # RAI Cloud database connection
-# con = api.Context(**config.read(profile=getenv("RAI_PROFILE")))
-
-# List of data keys to retain
-keys_to_retain = [
-    "bar_sea_level",
-    "dew_point",
-    "hum",
-    "hum_in",
-    "solar_rad",
-    "temp",
-    "temp_in",
-    "timestamp",
-    "uv_index",
-    "wind_dir_last",
-    "wind_speed_last",
-]
-
+# con = api.Context(**config.read(profile=wlconfig["dbs"]["rai"]["profile"]))
 
 # Stop execution of program
 def stop_service(sig, frame):
@@ -55,15 +41,17 @@ while True:
     #     body = response.read()
 
     # Convert response from a JSON string to a Dictionary
-    # json = loads(body)
+    # json = jsonloads(body)
 
     ###
     # For testing with local file(s)
     # Make sure to change
-    # - `from json import loads` => `from json import load`
+    # - `from json import loads as jsonloads` => `from json import load as jsonload`
     # - `# from datetime import datetime` => `from datetime import datetime`
-    with open("docs/example_packet.json") as f:
-        json = load(f)
+    with open(
+        Path(__file__).parent.parent.parent / "docs" / "example_packet.json"
+    ) as f:
+        json = jsonload(f)
     ###
 
     # Convenience variable for accessing contents of `data` key
@@ -75,13 +63,16 @@ while True:
     # Iterate over `conditions` key to extract desired key-value pairs
     for condition in data["conditions"]:
         for (k, v) in condition.items():
-            if k in keys_to_retain:
+            if k in wlconfig["weatherlink"]["keys_to_retain"]:
                 packet[k] = v
 
+    # `print` statements used for testing
     print(datetime.now())
     print(packet)
 
     # DATABASE UPDATE STRATEGY HERE...
+    # wlconfig["dbs"]["rai"]["compute"]
+    # wlconfig["dbs"]["rai"]["db"]
 
     # Wait for next request
-    sleep(REQUEST_INTERVAL)
+    sleep(wlconfig["weatherlink"]["interval"])

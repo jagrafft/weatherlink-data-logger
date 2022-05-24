@@ -8,7 +8,7 @@ license = "ISC"
 [tool.poetry.dependencies]
 python = "^3.10"
 rai-sdk = "^0.6.3"
-python-dotenv = "^0.20.0"
+pytomlpp = "^1.0.11"
 
 [tool.poetry.dev-dependencies]
 
