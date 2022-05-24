@@ -1,4 +1,4 @@
-from json import load as jsonload
+from json import loads as jsonloads
 from pathlib import Path
 from pytomlpp import load as tomload
 from signal import SIGINT, signal
@@ -8,7 +8,7 @@ from time import sleep
 from datetime import datetime
 
 # from railib import api, config
-# from urllib.request import Request, urlopen
+from urllib.request import Request, urlopen
 
 # Load TOML configuration for app from 'config' directory
 wlconfig = tomload(Path(__file__).parent.parent / "config" / "wlconfig.toml")
@@ -34,35 +34,35 @@ signal(SIGINT, stop_service)
 # and writing it to RAI Cloud
 while True:
     # Open URL then read response
-    # request = Request(method="GET", url=WEATHERLINK_URL_PATH)
+    request = Request(method="GET", url=WEATHERLINK_URL_PATH)
 
-    # with urlopen(request) as response:
-    #     body = response.read()
+    with urlopen(request) as response:
+        body = response.read()
 
     # Convert response from a JSON string to a Dictionary
-    # json = jsonloads(body)
+    json = jsonloads(body)
 
     ###
     # For testing with local file(s)
     # Make sure to change
     # - `from json import loads as jsonloads` => `from json import load as jsonload`
     # - `# from datetime import datetime` => `from datetime import datetime`
-    with open(
-        Path(__file__).parent.parent.parent / "docs" / "example_packet.json"
-    ) as f:
-        json = jsonload(f)
+    # with open(
+    #     Path(__file__).parent.parent.parent / "docs" / "example_packet.json"
+    # ) as f:
+    #     json = jsonload(f)
     ###
 
     # Convenience variable for accessing contents of `data` key
     data = json["data"]
 
-    # Add seed restricted packet with timestamp from Weatherlink service
+    # Seed packet with timestamp from Weatherlink service
     packet = {"ts": data["ts"]}
 
     # Iterate over `conditions` key to extract desired key-value pairs
     for condition in data["conditions"]:
         for (k, v) in condition.items():
-            if k in wlconfig["weatherlink"]["keys_to_retain"]:
+            if k in wlconfig["weatherlink"]["keys_to_retain"] and v is not None:
                 packet[k] = v
 
     # `print` statements used for testing
