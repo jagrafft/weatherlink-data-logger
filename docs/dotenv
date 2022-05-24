@@ -1,9 +1,0 @@
-# RAI Cloud
-RAI_DB=<<database>>
-RAI_COMPUTE=<<compute>>
-RAI_PROFILE=<<connection_profile>>
-
-# Weatherlink Service
-REQUEST_INTERVAL=<<seconds>>
-WEATHERLINK_URL=<<url>>
-WEATHERLINK_PATH=<<url_path>>
