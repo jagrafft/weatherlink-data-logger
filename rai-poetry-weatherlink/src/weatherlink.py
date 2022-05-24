@@ -12,7 +12,6 @@ from datetime import datetime
 
 # Load TOML configuration for app from 'config' directory
 wlconfig = tomload(Path(__file__).parent.parent / "config" / "wlconfig.toml")
-print(wlconfig)
 
 # Weatherlink service URL path
 WEATHERLINK_URL_PATH = (
