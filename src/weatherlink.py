@@ -69,6 +69,7 @@ if len(db.all()) == 0:
     packet = {k: v for (k, v) in sample().items() if k != "ts"}
     ts = time_ns()
 
+    # lmr_values = [{"key": k, "value": v, "ts": ts} for (k,v) in packet.items()] # use instead
     lmr_values = {"values": packet, "last_updates": {k: ts for k in packet.keys()}}
     db.insert(lmr_values)
 else:
