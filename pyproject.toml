@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rai-poetry-weatherlink"
+name = "weatherlink-data-logger-poetry"
 version = "0.0.1"
 description = ""
 authors = ["jason a. grafft <jason@grafft.co>"]

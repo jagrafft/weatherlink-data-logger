@@ -1,6 +1,5 @@
 # WeatherLink Data Logger
-
-Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Edition. Uses RAI Cloud and Rel to leverage formal 6NF (Graph/6th Normal Form) via [rai-sdk-python][raisdk].
+Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Edition.
 
 ## Parameters Used
 | Parameter         | Data Type | SQL Data Type | Tolerance (θ) | Note       |
@@ -19,5 +18,4 @@ Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Ed
 
 See [WeatherLink Live local API][wllla] 
 
-[raisdk]: https://github.com/RelationalAI/rai-sdk-python/
 [wllla]: https://weatherlink.github.io/weatherlink-live-local-api/

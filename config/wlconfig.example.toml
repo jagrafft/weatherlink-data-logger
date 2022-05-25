@@ -1,9 +1,6 @@
 [dbs]
-
-[dbs.rai]
-db = "<DATABASE>"
-compute = "<COMPUTE>"
-profile = "default"
+[tinydb]
+lmr_path = "<PATH>"
 
 [weatherlink]
 interval = 10
