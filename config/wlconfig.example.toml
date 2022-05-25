@@ -1,9 +1,10 @@
 [dbs]
-[tinydb]
+[dbs.tinydb]
+# Path for persisting Last Most Recent data values
 lmr_path = "<PATH>"
 
 [weatherlink]
-interval = 10
+interval = 8.5
 url = "<URL>"
 path = "/v1/current_conditions"
 keys_to_retain = [ "bar_sea_level","dew_point","hum","hum_in","solar_rad","temp","temp_in","timestamp","uv_index","wind_dir_last","wind_speed_last" ]
