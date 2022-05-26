@@ -6,7 +6,7 @@ authors = ["jason a. grafft <jason@grafft.co>"]
 license = "ISC"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 rai-sdk = "^0.6.3"
 pytomlpp = "^1.0.11"
 tinydb = "^4.7.0"

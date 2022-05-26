@@ -1,9 +1,13 @@
+from functools import partial
 from json import loads as jsonloads
+from math import atan
 from pathlib import Path
 from pytomlpp import load as tomload
+
+# from railib import api, config
 from signal import SIGINT, signal
 from sys import exit
-from time import sleep, time_ns
+from time import sleep
 from tinydb import TinyDB, Query
 from urllib.request import Request, urlopen
 
@@ -17,8 +21,24 @@ WEATHERLINK_URL_PATH = (
     f"{wlconfig['weatherlink']['url']}{wlconfig['weatherlink']['path']}"
 )
 
+print(WEATHERLINK_URL_PATH)
+# RAI Cloud database connection
+# con = api.Context(**config.read(profile=wlconfig["dbs"]["rai"]["profile"]))
 
-def sample():
+
+def diff_sample_with_lmr(LMR: dict, S: dict) -> dict:
+    shared_keys = {*S.keys()}.intersection({*LMR["values"].keys()})
+
+    return {
+        k: round(
+            atan(abs(S[k] - LMR["values"][k]) / (S["ts"] - LMR["last_updates"][k])), 3
+        )
+        for k in shared_keys
+        if k != "ts"
+    }
+
+
+def sample_weatherlink() -> dict:
     # Open URL then read response
     request = Request(method="GET", url=WEATHERLINK_URL_PATH)
 
@@ -63,28 +83,44 @@ def stop_service(sig, frame):
 # Listener for `CTRL-C` event
 signal(SIGINT, stop_service)
 
-db = TinyDB(wlconfig["dbs"]["tinydb"]["lmr_path"])
+# Database for persisting last-most-recent values
+db = TinyDB(f"{wlconfig['dbs']['tinydb']['lmr_path']}/last_most_recent.json")
 
 if len(db.all()) == 0:
-    packet = {k: v for (k, v) in sample().items() if k != "ts"}
-    ts = time_ns()
+    print("No Last Most Recent data avaialble, polling WeatherLink station...")
+    wl_sample = sample_weatherlink()
 
-    # lmr_values = [{"key": k, "value": v, "ts": ts} for (k,v) in packet.items()] # use instead
-    lmr_values = {"values": packet, "last_updates": {k: ts for k in packet.keys()}}
-    db.insert(lmr_values)
+    ts = wl_sample["ts"]
+    del wl_sample["ts"]
+
+    last_most_recent = {"values": wl_sample, "last_updates": {k: ts for k in wl_sample}}
+
+    db.insert(last_most_recent)
+    sleep(wlconfig["weatherlink"]["interval"])
 else:
-    lmv_values = db.all()
+    print("Last Most Recent data available, loading...")
+    # TODO improve strategy
+    last_most_recent = db.all()[0]
 
-print(lmr_values)
+# Database for persisting `diff`s (for validation and testing)
+diff_db = TinyDB(f"{wlconfig['dbs']['tinydb']['lmr_path']}/lmr_diffs.json")
 
 # Loop for requesting data from Weatherlink service
 # and writing it to RAI Cloud
 while True:
-    packet = sample()
+    current = sample_weatherlink()
+    diffs = diff_sample_with_lmr(last_most_recent, current)
 
-    # `print` statements used for testing
-    print(datetime.now())
-    print(packet)
+    # Combine packets above for study of output
+    agg = {
+        k: {"cur": current[k], "last": last_most_recent["values"][k], "theta": diffs[k]}
+        for k in current.keys()
+        if k != "ts"
+    }
+    agg["ts"] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    diff_db.insert(agg)
+
+    print(agg, "\n")
 
     # DATABASE UPDATE STRATEGY HERE...
 
