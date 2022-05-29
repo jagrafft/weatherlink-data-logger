@@ -1,5 +1,5 @@
 # WeatherLink Data Logger
-Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Edition.
+Python application to retreive then log data from a WeatherLink station using a difference function.
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type | Tolerance (θ) | Note       |
