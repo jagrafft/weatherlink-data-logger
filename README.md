@@ -1,7 +1,7 @@
 # WeatherLink Data Logger
 Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Edition.
 
-## Parameters Used
+## Parameters
 | Parameter         | Data Type | SQL Data Type | Tolerance (θ) | Note       |
 |:------------------|-----------|:-------------:|---------------|------------|
 | `bar_sea_level`   | Inch      | `REAL`        |               |            |
@@ -18,4 +18,12 @@ Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Ed
 
 See [WeatherLink Live local API][wllla] 
 
+
+## Setup
+1. Install [poetry][Poetry]
+2. Install [redis][Redis]
+3. ...
+
+[poetry]: https://python-poetry.org/
+[redis]: https://redis.io/
 [wllla]: https://weatherlink.github.io/weatherlink-live-local-api/
