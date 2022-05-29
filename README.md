@@ -20,8 +20,8 @@ See [WeatherLink Live local API][wllla]
 
 
 ## Setup
-1. Install [poetry][Poetry]
-2. Install [redis][Redis]
+1. Install [Poetry][poetry]
+2. Install [Redis][redis]
 3. ...
 
 [poetry]: https://python-poetry.org/
