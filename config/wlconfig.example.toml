@@ -3,6 +3,7 @@
 [dbs.redis]
 database=0
 host="localhost"
+n=0
 port=6379
 
 # Persisted data
@@ -10,8 +11,7 @@ port=6379
 path = "<PATH>"
 
 [weatherlink]
-interval = 8.5
+duration = 8.5
 keys_to_retain = [ "bar_sea_level", "dew_point", "hum", "hum_in", "solar_rad", "temp", "temp_in", "timestamp", "uv_index", "wind_dir_last", "wind_speed_last" ]
 path = "/v1/current_conditions"
-theta_threshold = 0.6 # radians
 url = "<URL>"
