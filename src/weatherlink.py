@@ -4,7 +4,7 @@ from pathlib import Path
 from signal import SIGINT, signal
 from time import sleep
 from weatherlink_utils import (
-    get_current_conditions,
+    get_current_conditions_batch,
     wlconfig,
     KEYS_TO_RETAIN,
     SLEEP_DURATION,
@@ -35,14 +35,16 @@ arrow_schema = pa.schema(
 arrow_sink = pa.OSFile(f"{wlconfig['arrow']['data_path']}/weatherlink_data.arrow", "wb")
 
 # Writer for Arrow file
-arrow_writer = pa.ipc.new_file(arrow_sink, arrow_schema)
+arrow_stream_writer = pa.ipc.new_file(
+    arrow_sink, arrow_schema, options=pa.ipc.IpcWriteOptions(allow_64bit=True)
+)
 
 # Listener for `CTRL-C` event
 def stop_service(sig, frame):
     """
     Stop execution of program. Called by `signal` on `SIGINT`.
     """
-    arrow_writer.close()
+    arrow_stream_writer.close()
     arrow_sink.close()
 
     print("Stopping service...")
@@ -56,14 +58,18 @@ signal(SIGINT, stop_service)
 print(WEATHERLINK_URL_PATH)
 
 ### REQUEST DATA FROM WEATHERLINK SERVICE TILL `SIGINT` IS ISSUED ###
-while True:
+batch = 1
+while batch > 0:
+    print(f"Sampling batch {batch} from WeatherLink device...")
     # Sample (approximately) current conditions round sensor array
-    current_conditions_data = get_current_conditions(
-        WEATHERLINK_URL_PATH, KEYS_TO_RETAIN
+    current_conditions_batch = get_current_conditions_batch(
+        WEATHERLINK_URL_PATH, KEYS_TO_RETAIN, arrow_schema, SLEEP_DURATION, batch_size=3
     )
 
     # Write values to Arrow sink
-    arrow_writer.write(pa.record_batch(current_conditions_data, arrow_schema))
+    arrow_stream_writer.write_batch(current_conditions_batch)
+    print(f"Batch {batch} complete!")
+    batch += 1
 
     # Pause before making next request
     sleep(SLEEP_DURATION)

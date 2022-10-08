@@ -27,38 +27,48 @@ WEATHERLINK_URL_PATH = (
     (requests.exceptions.Timeout, requests.exceptions.ConnectionError),
     on_backoff=sleep(SLEEP_DURATION),
 )
-def get_current_conditions(url: str, keys_to_retain: list) -> dict:
+def get_current_conditions_batch(
+    url: str,
+    keys_to_retain: list,
+    schema,
+    sleep_duration: float,
+    batch_size: int = 1000,
+) -> dict:
     """
     Sample data from the WeatherLink device at `url` then filter to
     return a dictionary with only the keys listed in `keys_to_retain`.
     """
-    # Open URL then read response
-    request = Request(method="GET", url=url)
+    current_conditions_batch = {k: [] for k in keys_to_retain}
 
-    with urlopen(request) as response:
-        body = response.read()
+    for i in range(1, batch_size + 1, 1):
+        print(f"{i}/{batch_size}: Sampling WeatherLink device...", end="")
+        # Open URL then read response
+        request = Request(method="GET", url=url)
 
-    # Convert response from a JSON string to a Dictionary
-    current_conditions_json = jsonloads(body)
+        with urlopen(request) as response:
+            body = response.read()
 
-    # Convenience variable for accessing contents of `data` key
-    current_conditions = current_conditions_json["data"]
+        # Convert response from a JSON string to a Dictionary
+        current_conditions_json = jsonloads(body)
 
-    # Seed current_conditions with timestamp from Weatherlink service
-    current_conditions_data = [pa.array([current_conditions["ts"]], type=pa.int64())]
+        # Convenience variable for accessing contents of `data` key
+        current_conditions = current_conditions_json["data"]
 
-    # current_conditions_names = ["timestamp"]
+        current_conditions_batch["timestamp"].append(current_conditions["ts"])
 
-    # Iterate over `conditions` key to extract desired key-value pairs
-    # then assign them to `current_conditions`
-    for conditions in current_conditions["conditions"]:
-        retained_pairs = {
-            k: v
-            for (k, v) in conditions.items()
-            if (k in keys_to_retain) and (v is not None)
-        }
+        # Iterate over `conditions` key to extract desired key-value pairs
+        # then assign them to `current_conditions`
+        for conditions in current_conditions["conditions"]:
+            for (k, v) in conditions.items():
+                if k in keys_to_retain:
+                    current_conditions_batch[k].append(v)
 
-        for (k, v) in retained_pairs.items():
-            current_conditions_data.append(pa.array([v], type=pa.float64()))
+        print("DONE")
+        sleep(sleep_duration)
 
-    return current_conditions_data
+    current_conditions_data = []
+
+    for (k, v) in current_conditions_batch.items():
+        current_conditions_data.append(pa.array(v))
+
+    return pa.record_batch(current_conditions_data, schema)

@@ -12,6 +12,8 @@ path = "<PATH>"
 
 [weatherlink]
 duration = 8.5
-keys_to_retain = [ "bar_sea_level", "dew_point", "hum", "hum_in", "solar_rad", "temp", "temp_in", "timestamp", "uv_index", "wind_dir_last", "wind_speed_last" ]
+keys_to_retain = [ "timestamp", "temp", "hum", "dew_point", "wind_speed_last", "wind_dir_last", "temp_in", "hum_in", "bar_sea_level" ]
+# 'solar_rad' and 'uv_index' currently omitted
+# keys_to_retain = [ "bar_sea_level", "dew_point", "hum", "hum_in", "solar_rad", "temp", "temp_in", "timestamp", "uv_index", "wind_dir_last", "wind_speed_last" ]
 path = "/v1/current_conditions"
 url = "<URL>"
