@@ -1,5 +1,7 @@
 # TOML config
 wlconfig.toml
+*.arrow
+*.parquet
 
 __pycache__/
 
