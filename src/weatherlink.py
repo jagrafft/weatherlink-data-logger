@@ -1,3 +1,6 @@
+import backoff
+import requests
+
 from datetime import datetime
 from json import loads as jsonloads
 from pathlib import Path
@@ -49,7 +52,12 @@ redis_con = Redis(
 redis_con.select(wlconfig["dbs"]["redis"]["database"])
 
 
-# Function to poll WeatherLink station
+# Function to poll WeatherLink station, with backoff on request failure
+@backoff.on_exception(
+    backoff.expo,
+    (requests.exceptions.Timeout, requests.exceptions.ConnectionError),
+    on_backoff=sleep(SLEEP_INTERVAL),
+)
 def get_current_conditions(url: str, keys_to_retain: list) -> dict:
     """
     Sample data from the WeatherLink device at `url` then filter to
