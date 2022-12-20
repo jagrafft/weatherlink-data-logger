@@ -1,6 +1,7 @@
 from datetime import datetime
 from json import loads as jsonloads
 from pathlib import Path
+from pytomlpp import load as tomload
 from redis import Redis
 from signal import SIGINT, signal
 from sys import exit
@@ -22,12 +23,14 @@ signal(SIGINT, stop_service)
 
 # Load TOML configuration for app from 'config' directory
 config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
+print(config_path)
 
 try:
     wlconfig = tomload(config_path)
 except:
-    print(f"Error loading TOML at '{config_path}', exiting...")
+    print(f"Unable to load '{config_path}', exiting...")
     exit()
+
 
 # Set session variables from TOML config
 KEYS_TO_RETAIN = wlconfig["weatherlink"]["keys_to_retain"]
@@ -95,4 +98,4 @@ while True:
     redis_con.xadd(wlconfig["dbs"]["redis"]["stream_name"], current_conditions)
 
     # Pause before making next request
-    sleep(SLEEP_DURATION)
+    sleep(SLEEP_INTERVAL)
