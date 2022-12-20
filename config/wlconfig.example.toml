@@ -1,14 +1,10 @@
 [dbs]
-# Last Most Recent value store
 [dbs.redis]
 database=0
 host="localhost"
 n=0
 port=6379
-
-# Persisted data
-[dbs.tinydb]
-path = "<PATH>"
+stream_name="wlink"
 
 [weatherlink]
 duration = 8.5
