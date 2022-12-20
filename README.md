@@ -1,5 +1,7 @@
-# WeatherLink Data Logger
-Python application to retreive then log data from a WeatherLink station using a difference function.
+# WeatherLink Data Logger: Last Most Recent Difference (_ARCHIVED_)
+Python application to retreive then log data from a WeatherLink station using a difference function. Proof-of-concept retained for reference.
+
+Branch is archived.
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type | Note       |
