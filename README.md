@@ -31,7 +31,7 @@ See [WeatherLink Live local API][wllla]
 ## "Wish List"
 Features I have an eye to add (bear in mind this is a hobby project).
 
-- [ ] Export Redis stream to
+- [ ] Export Redis stream (likely via Consumer Groups) to
   - [ ] Apache Arrow
   - [ ] Postgres (6NF)
   - [ ] SQLite (6NF)
