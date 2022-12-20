@@ -1,5 +1,13 @@
-# WeatherLink Data Logger
+# WeatherLink Data Logger: Development Branch
 Python application to poll a WeatherLink station and push data to a [Redis][redis] stream. Parses the return packet for the data points listed in [Parameters](#parameters). You may change what is captured by modifying the elements in `wlconfig.toml:keys_to_retain`---see `docs/` for an example [WeatherLink Live Local API][wllla] return packet.
+
+#### "Wish List"
+Features I have an eye to add (bear in mind this is a hobby project).
+
+- [ ] Export Redis stream to
+  - [ ] Apache Arrow
+  - [ ] Postgres (6NF)
+  - [ ] SQLite (6NF)
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type | Note       |
