@@ -1,5 +1,5 @@
-# WeatherLink Data Logger
-Next... concept?... for the kludge-tastic Weatherlink Data Logger: JavaScript Edition.
+# WeatherLink Data Logger: Development Branch
+Python application to poll a WeatherLink station and push data to a [Redis][redis] stream.
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type | Tolerance (θ) | Note       |
@@ -21,8 +21,13 @@ See [WeatherLink Live local API][wllla]
 
 ## Setup
 1. Install [Poetry][poetry]
-2. Install [Redis][redis]
-3. ...
+1. Install [Redis][redis]
+1. `git clone https://github.com/jagrafft/weatherlink-data-logger.git`
+1. `cd weatherlink-data-logger/`
+1. `cp config/wlconfig.example.toml config/wlconfig.toml`
+1. Edit `config/wlconfig.toml` as needed
+1. `poetry install`
+1. `poetry run python3 src/weatherlink.py`
 
 [poetry]: https://python-poetry.org/
 [redis]: https://redis.io/

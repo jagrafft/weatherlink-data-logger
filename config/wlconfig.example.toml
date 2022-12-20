@@ -1,17 +1,12 @@
 [dbs]
-# Last Most Recent value store
 [dbs.redis]
 database=0
 host="localhost"
 port=6379
-
-# Persisted data
-[dbs.tinydb]
-path = "<PATH>"
+stream_name="wlink"
 
 [weatherlink]
 interval = 8.5
 keys_to_retain = [ "bar_sea_level", "dew_point", "hum", "hum_in", "solar_rad", "temp", "temp_in", "timestamp", "uv_index", "wind_dir_last", "wind_speed_last" ]
 path = "/v1/current_conditions"
-theta_threshold = 0.6 # radians
 url = "<URL>"
