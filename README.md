@@ -1,5 +1,5 @@
 # WeatherLink Data Logger: Development Branch
-Python application to poll a WeatherLink station and push data to a [Redis][redis] stream. Parses the return packet for the data points listed in [Parameters](#parameters). You may change what is captured by modifying the elements in `wlconfig.toml:keys_to_retain`---see `docs/` for an example [WeatherLink Live Local API][wllla] return packet.
+Python application to poll a WeatherLink station and push data to a [Redis][redis] stream. Parses the return packet for the data points listed in [Parameters](#parameters). You may change what is captured by modifying the elements in `wlconfig.toml:keys_to_retain`--see `docs/` for an example [WeatherLink Live Local API][wllla] return packet.
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type | Note       |
