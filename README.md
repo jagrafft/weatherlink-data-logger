@@ -1,5 +1,7 @@
-# WeatherLink Data Logger
+# WeatherLink Data Logger (ARCHIVED)
 Python application to retreive then log data from a WeatherLink station. This branch experiments with writing data to Apache Arrow file streams with the longer-term objective of utilizing the Arrow Flight service.
+
+Branch is archived.
 
 ## Parameters
 | Parameter         | Data Type | SQL Data Type |
