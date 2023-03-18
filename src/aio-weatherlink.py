@@ -1,13 +1,10 @@
 import asyncio
 import aiohttp
 
-# from datetime import datetime
-# from json import loads as jsonloads
 from pathlib import Path
 from pytomlpp import load as tomload
 
 # from redis import Redis
-# from signal import SIGINT, signal
 from sys import exit
 from time import sleep
 
@@ -33,26 +30,17 @@ async def fetch(session: aiohttp.ClientSession, url: str) -> dict:
         return await resp.json()
 
 
-async def main() -> None:
-    # Load TOML configuration for app from 'config' directory
-    config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
-    # print(config_path)
-
-    try:
-        wlconfig = tomload(config_path)
-    except:
-        print(f"Unable to load '{config_path}', exiting...")
-        exit()
-
+# async def main(config: dict, rdb: redis.Redis) -> None:
+async def main(config: dict) -> None:
     # Set session variables from TOML config
-    # keys_to_retain = wlconfig["weatherlink"]["keys_to_retain"]
+    # keys_to_retain = config["weatherlink"]["keys_to_retain"]
     request_timeout = aiohttp.ClientTimeout(
-        total=wlconfig["weatherlink"]["request_timeout"]
+        total=config["weatherlink"]["request_timeout"]
     )
-    sleep_interval = wlconfig["weatherlink"]["sleep_interval"]
+    sleep_interval = config["weatherlink"]["sleep_interval"]
     url = (
-        # f"{wlconfig['weatherlink']['url']}{wlconfig['weatherlink']['path']}"
-        f"{wlconfig['weatherlink']['url']}"
+        # f"{config['weatherlink']['url']}{config['weatherlink']['path']}"
+        f"{config['weatherlink']['url']}"
     )
 
     async with aiohttp.ClientSession(timeout=request_timeout) as session:
@@ -69,7 +57,17 @@ async def main() -> None:
             sleep(sleep_interval)
 
 
-## Start Async Application ##
+## Start Application ##
+# Load TOML configuration for app from 'config' directory
+config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
+# print(config_path)
+
+try:
+    wlconfig = tomload(config_path)
+except:
+    print(f"Unable to load '{config_path}', exiting...")
+    exit()
+
 # Redis connection
 # try:
 #     redis_con = Redis(
@@ -86,7 +84,8 @@ loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
 try:
-    asyncio.run(main())
+    asyncio.run(main(wlconfig))
+    # asyncio.run(main(wlconfig, redis_con))
 except KeyboardInterrupt:
     print("Stopping service...")
     exit(0)
