@@ -1,4 +1,16 @@
 # WeatherLink Data Logger: Development Notes
+### 2023-03-18
+- HTTP requests are made asynchronously via `aiohttp`
+  - Application continues execution on `SUCCESS` or `FAILURE`
+    - Addresses issue of application halting ("crashing") on an HTTP error
+  - Exceptions are logged as `WARNING`s
+- Added logger
+  - Prints to `stdout`
+  - Writes to `*.log` file in `Path.cwd()`
+- Updated TOML configuration structure
+  - Removed nesting for `db` entries
+  - Renamed keys
+
 ### 2022-12-20
 - Removed all calculations for and references to difference between data points
 - Data now are inserted into a Redis Stream

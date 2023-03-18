@@ -4,13 +4,31 @@ import logging
 
 from pathlib import Path
 from pytomlpp import load as tomload
-
-# from redis import Redis
-from sys import exit
+from sys import exit, stdout
 from time import localtime, sleep, strftime
 
+# from redis import Redis
 
-def extract_wl_kvs(data: dict, keys: list) -> dict:
+## Initiate Logging ##
+script_start_time = strftime("%Y-%m-%dT%H%M%S", localtime())
+
+logger = logging.getLogger("wl_logger")
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+file_handler = logging.FileHandler(Path.cwd() / f"weatherlink_{script_start_time}.log")
+stream_handler = logging.StreamHandler(stdout)
+
+file_handler.setFormatter(log_formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
+##
+
+"""
+def extract_weatherlink_keys(data: dict, keys: list) -> dict:
     # Extracted Key-Value pairs from a WeatherLink data packet
 
     extracted_kv = {"ts": data["ts"]}
@@ -24,6 +42,7 @@ def extract_wl_kvs(data: dict, keys: list) -> dict:
             extracted_kv[k] = v
 
     return extracted_kv
+"""
 
 
 async def fetch(session: aiohttp.ClientSession, url: str) -> dict:
@@ -31,71 +50,74 @@ async def fetch(session: aiohttp.ClientSession, url: str) -> dict:
         return await resp.json()
 
 
-# async def main(config: dict, rdb: redis.Redis) -> None:
+# async def main(config: dict, rdb: redis.Redis, logger: logging.Logger) -> None:
 async def main(config: dict, logger: logging.Logger) -> None:
+    # Entering asynchronous code block, log as successful start
+    logger.info("SUCCESS")
     # Set session variables from TOML config
-    # keys_to_retain = config["weatherlink"]["keys_to_retain"]
+    # keys = config["weatherlink"]["keys_to_retain"]
     request_timeout = aiohttp.ClientTimeout(
         total=config["weatherlink"]["request_timeout"]
     )
-    sleep_interval = config["weatherlink"]["sleep_interval"]
-    url = (
-        # f"{config['weatherlink']['url']}{config['weatherlink']['path']}"
-        f"{config['weatherlink']['url']}"
-    )
+    request_interval = config["weatherlink"]["request_interval"]
+    url = config["weatherlink"]["url"]
+
+    # Used for testing with 'http://httpbin.org/delay'
+    from random import randint
 
     async with aiohttp.ClientSession(timeout=request_timeout) as session:
         while True:
-            logger.info(f"fetch {url}")
-            try:
-                json_response = await fetch(session, url)
-                print(json_response)
-                # kvs = extract_wl_kvs(json_response, keys_to_retain)
-                # print(kvs)
-            except Exception:
-                logger.error("EXCEPTION")
+            # Used for testing with 'http://httpbin.org/delay'
+            delay = randint(0, 10)
+            logger.info(f"fetch '{url}/{delay}'...")
 
-            sleep(sleep_interval)
+            # logger.info(f"fetch '{url}'...")
+            try:
+                # Used for testing with 'http://httpbin.org/delay'
+                json_response = await fetch(session, f"{url}/{delay}")
+
+                # json_response = await fetch(session, url)
+                # data_to_persist = extract_weatherlink_keys(json_response, keys)
+                print(json_response)
+                # print(data_to_persist)
+                logger.info("SUCCESS")
+            except Exception as e:
+                logger.warning(f"EXCEPTION: {repr(e)}")
+
+            sleep(request_interval)
 
 
 ## Start Application ##
-# Initiate logger
-script_start_time = strftime("%Y-%m-%dT%H%M%S", localtime())
-
-logger = logging.getLogger("wl_logger")
-logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-
-file_handler = logging.FileHandler(Path.cwd() / f"weatherlink_{script_start_time}.log")
-file_handler.setFormatter(log_formatter)
-
-logger.addHandler(file_handler)
-
-# Load TOML configuration for app from 'config' directory
-config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
-# print(config_path)
-
+# Load TOML Configuration for App
 try:
+    config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
+    logger.info(f"LOAD '{config_path}'...")
     wlconfig = tomload(config_path)
-except:
-    logger.critical(f"Unable to load '{config_path}', exiting...")
+except Exception as e:
+    logger.error(f"EXCEPTION: {repr(e)}")
+    logger.critical("EXITING")
     exit()
 
-# Redis connection
-# logger.info(f'Establish connection to Redis instance at {wlconfig['dbs']['redis']['host']}:{wlconfig['dbs']['redis']['port']} (database {wlconfig['dbs']['redis']['database']})')
-# try:
-#     redis_con = redis.ConnectionPool(
-#         host=wlconfig["dbs"]["redis"]["host"], port=wlconfig["dbs"]["redis"]["port"], db=
-#     )
-# except:
-#    print(f"Cannot connect to Redis instance at {wlconfig["dbs"]["redis"]["host"]}:{wlconfig["dbs"]["redis"]["port"]} (database {wlconfig['dbs']['redis']['database']}), exiting...")
-#    logger.error(f"Cannot connect to Redis instance at {wlconfig["dbs"]["redis"]["host"]}:{wlconfig["dbs"]["redis"]["port"]} (database {wlconfig['dbs']['redis']['database']}), exiting...")
-#    exit(0)
+logger.info("SUCCESS")
 
-# logger.info(f"Connected to Redis instance at {wlconfig['dbs']['redis']['host']}:{wlconfig['dbs']['redis']['port']} (database {wlconfig['dbs']['redis']['database']})")
+# Establish Redis Connection
+"""
+try:
+    logger.info(f"CONNECT to Redis instance at {wlconfig['redis']['host']}:{wlconfig['redis']['port']} (database {wlconfig['redis']['database']})")
 
+    redis_con = redis.ConnectionPool(
+        host=wlconfig["redis"]["host"], port=wlconfig["redis"]["port"], db=wlconfig["redis"]["database"]
+    )
+except Exception as e:
+   logger.error(f"EXCEPTION: {repr(e)}")
+   logger.error("CANNOT connect to Redis instance")
+   logger.critical("EXITING")
+   exit()
+
+logger.info("CONNECTED")
+"""
+
+logger.info("START asynchronous application service...")
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
@@ -103,23 +125,21 @@ try:
     asyncio.run(main(wlconfig, logger))
     # asyncio.run(main(wlconfig, redis_con))
 except KeyboardInterrupt:
-    logger.critical("KeyboardInterrupt, stopping service...")
-    print("Stopping service...")
+    logger.warning("KeyboardInterrupt, stopping service...")
+    exit()
+except Exception as e:
+    logger.error(f"EXCEPTION: {repr(e)}")
+    logger.critical("EXITING")
     exit()
 
 
+## NEED TO IMPLEMENT ##
 # Function to poll WeatherLink station, with backoff on request failure
 #     # Convenience variable for accessing contents of `data` key
 #     current_conditions_data = current_conditions_json["data"]
-
 # Sample (approximately) current conditions round sensor array
 # while True:
 #     current_conditions = get_current_conditions(WEATHERLINK_URL_PATH, KEYS_TO_RETAIN)
-#
 #     print(current_conditions)
-#
 #     # Push to Redis Stream
-#     redis_con.xadd(wlconfig["dbs"]["redis"]["stream_name"], current_conditions)
-#
-#     # Pause before making next request
-#     sleep(SLEEP_INTERVAL)
+#     redis_con.xadd(wlconfig["redis"]["stream_name"], current_conditions)
