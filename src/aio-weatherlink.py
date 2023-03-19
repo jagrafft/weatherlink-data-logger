@@ -90,7 +90,7 @@ async def main(config: dict, logger: logging.Logger) -> None:
 ## Start Application ##
 # Load TOML Configuration for App
 try:
-    config_path = Path(__file__).parent.parent / "config" / "wlconfig.toml"
+    config_path = Path(__file__).parent.parent / "config" / "config.toml"
     logger.info(f"LOAD '{config_path}'...")
     wlconfig = tomload(config_path)
 except Exception as e:
@@ -142,4 +142,4 @@ except Exception as e:
 #     current_conditions = get_current_conditions(WEATHERLINK_URL_PATH, KEYS_TO_RETAIN)
 #     print(current_conditions)
 #     # Push to Redis Stream
-#     redis_con.xadd(wlconfig["redis"]["stream_name"], current_conditions)
+#     redis_con.xadd(wlconfig["redis"]["stream_prefix"], current_conditions)
