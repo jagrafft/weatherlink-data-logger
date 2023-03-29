@@ -9,26 +9,8 @@ from time import localtime, sleep, strftime
 
 # from redis import Redis
 
-## Initiate Logging ##
-script_start_time = strftime("%Y-%m-%dT%H%M%S", localtime())
-
-logger = logging.getLogger("wl_logger")
-logger.setLevel(logging.DEBUG)
-log_formatter = logging.Formatter(
-    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-
-file_handler = logging.FileHandler(Path.cwd() / f"weatherlink_{script_start_time}.log")
-stream_handler = logging.StreamHandler(stdout)
-
-file_handler.setFormatter(log_formatter)
-
-logger.addHandler(file_handler)
-logger.addHandler(stream_handler)
-##
-
 """
-def extract_weatherlink_keys(data: dict, keys: list) -> dict:
+async def extract_weatherlink_keys(data: dict, keys: list) -> dict:
     # Extracted Key-Value pairs from a WeatherLink data packet
 
     extracted_kv = {"ts": data["ts"]}
@@ -41,16 +23,24 @@ def extract_weatherlink_keys(data: dict, keys: list) -> dict:
         for (k, v) in retained_pairs.items():
             extracted_kv[k] = v
 
-    return extracted_kv
+    return await extracted_kv
 """
-
 
 async def fetch(session: aiohttp.ClientSession, url: str) -> dict:
     async with session.get(url) as resp:
         return await resp.json()
 
+# async def insert_pg(con: ..., vals: dict):
+    """insert into NeonDB instance"""
 
-# async def main(config: dict, rdb: redis.Redis, logger: logging.Logger) -> None:
+async def insert_xstream(rdb: redis.Redis, stream: str vals: dict):
+    try:
+        return await rdb.xadd(stream, vals)
+    except Exception as e:
+        raise
+    
+
+# async def main(config: dict, pdb: pg...., rdb: redis.Redis, logger: logging.Logger) -> None:
 async def main(config: dict, logger: logging.Logger) -> None:
     # Entering asynchronous code block, log as successful start
     logger.info("SUCCESS")
@@ -88,17 +78,41 @@ async def main(config: dict, logger: logging.Logger) -> None:
 
 
 ## Start Application ##
+## Initiate Logging ##
+script_start_time = strftime("%Y-%m-%dT%H%M%S", localtime())
+
+logger = logging.getLogger("wl_logger")
+logger.setLevel(logging.DEBUG)
+log_formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+
+file_handler = logging.FileHandler(Path.cwd() / f"weatherlink_{script_start_time}.log")
+stream_handler = logging.StreamHandler(stdout)
+
+file_handler.setFormatter(log_formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(stream_handler)
+##
+
 # Load TOML Configuration for App
 try:
     config_path = Path(__file__).parent.parent / "config" / "config.toml"
-    logger.info(f"LOAD '{config_path}'...")
+    logger.info(f"Load TOML configuration at '{config_path}'...")
     wlconfig = tomload(config_path)
+    logger.info("SUCCESS")
 except Exception as e:
-    logger.error(f"EXCEPTION: {repr(e)}")
+    logger.exception("Cannot load TOML configuation")
     logger.critical("EXITING")
     exit()
+##
 
-logger.info("SUCCESS")
+# Establish NeonDB Connection
+"""
+try:
+except Exception as e:
+"""
 
 # Establish Redis Connection
 """
@@ -109,8 +123,7 @@ try:
         host=wlconfig["redis"]["host"], port=wlconfig["redis"]["port"], db=wlconfig["redis"]["database"]
     )
 except Exception as e:
-   logger.error(f"EXCEPTION: {repr(e)}")
-   logger.error("CANNOT connect to Redis instance")
+   logger.exception("CANNOT connect to Redis instance")
    logger.critical("EXITING")
    exit()
 
